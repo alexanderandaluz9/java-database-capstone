@@ -2,7 +2,7 @@ package com.project.back_end.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+import jakarta.persistence.Transient;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,6 +33,7 @@ public class Appointment {
 
   private Integer status; // 0 = scheduled, 1 = completed
 
+  @Transient
   public LocalDateTime getEndTime() {
     return this.appointmentTime.plusHours(1);
   }
