@@ -1,41 +1,41 @@
 package com.project.back_end.mvc;
 
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-import com.project.back_end.services.TokenService;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class DashboardController {
 
+    // 2. Autowire the shared service (assumed name: TokenValidationService)
     @Autowired
-    private TokenService tokenService;
+    private TokenValidationService tokenValidationService;
 
+    // 3. Admin dashboard handler
     @GetMapping("/adminDashboard/{token}")
-    public String adminDashboard(@PathVariable String token) {
+    public ModelAndView adminDashboard(@PathVariable("token") String token) {
+        boolean isValid = tokenValidationService.validateToken(token, "admin");
 
-        Map<String, String> result = tokenService.validateToken(token, "admin");
-
-        if (result.isEmpty()) {
-            return "admin/adminDashboard";
+        if (isValid) {
+            return new ModelAndView("admin/adminDashboard");
+        } else {
+            return new ModelAndView("redirect:/");
         }
-
-        return "redirect:/";
     }
 
+    // 4. Doctor dashboard handler
     @GetMapping("/doctorDashboard/{token}")
-    public String doctorDashboard(@PathVariable String token) {
+    public ModelAndView doctorDashboard(@PathVariable("token") String token) {
+        boolean isValid = tokenValidationService.validateToken(token, "doctor");
 
-        Map<String, String> result = tokenService.validateToken(token, "doctor");
-
-        if (result.isEmpty()) {
-            return "doctor/doctorDashboard";
+        if (isValid) {
+            return new ModelAndView("doctor/doctorDashboard");
+        } else {
+            return new ModelAndView("redirect:/");
         }
-
-        return "redirect:/";
     }
 }
+

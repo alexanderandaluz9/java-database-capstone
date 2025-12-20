@@ -1,110 +1,93 @@
 package com.project.back_end.controllers;
 
+import com.project.back_end.DTO.AppointmentDTO;
 import com.project.back_end.DTO.Login;
 import com.project.back_end.models.Patient;
 import com.project.back_end.services.PatientService;
-import com.project.back_end.services.AuthService;
-import jakarta.validation.Valid;
+import com.project.back_end.services.Service;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import java.util.List;
 
-@RestController
-@RequestMapping("${api.path}patient")
+@RestController // 1. Mark as REST controller
+@RequestMapping("/patient") // Group all patient operations under /patient
 public class PatientController {
 
     private final PatientService patientService;
-    private final AuthService service;
+    private final Service service;
 
-    public PatientController(PatientService patientService, AuthService service) {
+    // 2. Constructor-based injection
+    //@Autowired
+    public PatientController(PatientService patientService, Service service) {
         this.patientService = patientService;
         this.service = service;
     }
 
-    // 3. Get patient details
-    @GetMapping("/{token}")
+    // 3. Get patient details using token
+    @GetMapping("/me/{token}")
     public ResponseEntity<?> getPatient(@PathVariable String token) {
-
-        ResponseEntity<?> tokenValidation = service.validateToken(token, "patient");
-        if (tokenValidation.getStatusCode() != HttpStatus.OK) {
-            return tokenValidation;
+        if (!service.validateToken(token, "patient")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token.");
         }
 
-        return ResponseEntity.ok(
-                patientService.getPatientByToken(token)
-        );
+        Patient patient = patientService.getPatientDetails(token);
+        if (patient == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Patient not found.");
+        }
+
+        return ResponseEntity.ok(patient);
     }
 
-    // 4. Create patient
-    @PostMapping
-    public ResponseEntity<Map<String, String>> createPatient(
-            @Valid @RequestBody Patient patient) {
-
-        boolean isValid = service.validatePatient(patient);
-
-        if (!isValid) {
-            return ResponseEntity
-                    .status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Patient already exists"));
+    // 4. Register a new patient
+    @PostMapping("/register")
+    public ResponseEntity<?> createPatient(@RequestBody Patient patient) {
+        if (!service.validatePatient(patient)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Patient already exists with given email or phone.");
         }
 
-        boolean created = patientService.savePatient(patient);
-
-        if (!created) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Could not create patient"));
-        }
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(Map.of("message", "Patient created successfully"));
+        int result = patientService.createPatient(patient);
+        return switch (result) {
+            case 1 -> ResponseEntity.status(HttpStatus.CREATED).body("Patient registered successfully.");
+            case 0 -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving patient.");
+            default -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected error.");
+        };
     }
 
-    // 5. Patient login
+    // 5. Login patient
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(
-            @Valid @RequestBody Login login) {
-
-        return service.validatePatientLogin(
-                login.getEmail(),
-                login.getPassword()
-        );
+    public ResponseEntity<?> login(@RequestBody Login login) {
+        return service.validatePatientLogin(login.getEmail(), login.getPassword());
     }
 
-    // 6. Get patient appointments
-    @GetMapping("/appointments/{user}/{patientId}/{token}")
-    public ResponseEntity<?> getPatientAppointment(
-            @PathVariable String user,
-            @PathVariable Long patientId,
-            @PathVariable String token) {
-
-        ResponseEntity<?> tokenValidation = service.validateToken(token, user);
-        if (tokenValidation.getStatusCode() != HttpStatus.OK) {
-            return tokenValidation;
+    // 6. Get appointments for patient
+    @GetMapping("/appointments/{patientId}/{user}/{token}")
+    public ResponseEntity<?> getPatientAppointments(@PathVariable Long patientId,
+                                                    @PathVariable String user,
+                                                    @PathVariable String token) {
+        if (!service.validateToken(token, user)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token.");
         }
 
-        return ResponseEntity.ok(
-                patientService.getAppointmentsByPatientId(patientId)
-        );
+        List<AppointmentDTO> appointments = patientService.getPatientAppointment(patientId);
+        return ResponseEntity.ok(appointments);
     }
 
-    // 7. Filter patient appointments
-    @GetMapping("/appointments/filter/{token}")
-    public ResponseEntity<?> filterPatientAppointment(
-            @RequestParam(required = false) String condition,
-            @RequestParam(required = false) String name,
-            @PathVariable String token) {
-
-        ResponseEntity<?> tokenValidation = service.validateToken(token, "patient");
-        if (tokenValidation.getStatusCode() != HttpStatus.OK) {
-            return tokenValidation;
+    // 7. Filter appointments (past/future/doctor name)
+    @GetMapping("/appointments/filter")
+    public ResponseEntity<?> filterPatientAppointment(@RequestParam(required = false) String condition,
+                                                      @RequestParam(required = false) String name,
+                                                      @RequestParam String token) {
+        if (!service.validateToken(token, "patient")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token.");
         }
 
-        return ResponseEntity.ok(
-                service.filterPatient(token, condition, name)
-        );
+        List<AppointmentDTO> filtered = service.filterPatient(token, condition, name);
+        return ResponseEntity.ok(filtered);
     }
 }
+
+
+

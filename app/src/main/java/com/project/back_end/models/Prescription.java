@@ -1,92 +1,93 @@
 package com.project.back_end.models;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 @Document(collection = "prescriptions")
-
 public class Prescription {
-  @Id
-  private String id;
 
-  @NotNull
-  @Size(min = 3, max = 100)
-  private String patientName;
-  
-  @NotNull
-  private Long appointmentId;
+    @Id
+    private String id;
 
-  @NotNull
-  @Size(min = 3, max = 100)
-  private String medication;
-  
-  @NotNull
-  @Size(min = 3, max = 20)
-  private String dosage;
-  
-  @Size(max = 200)
-  private String doctorNotes;
-// Constructors:
-  public Prescription() {
-  }
+    @NotNull(message = "Patient name is required")
+    @Size(min = 3, max = 100, message = "Patient name must be between 3 and 100 characters")
+    private String patientName;
 
-  public Prescription(String patientName, Long appointmentId, String medication, String dosage, String doctorNotes) {
-    this.patientName = patientName;
-    this.appointmentId = appointmentId;
-    this.medication = medication;
-    this.dosage = dosage;
-    this.doctorNotes = doctorNotes;
-  }
+    @NotNull(message = "Appointment ID is required")
+    private Long appointmentId;
 
-// Getters and Setters:
-  public String getId() {
-    return id;
-  }
+    @NotNull(message = "Medication name is required")
+    @Size(min = 3, max = 100, message = "Medication name must be between 3 and 100 characters")
+    private String medication;
 
-  public void setId(String id) {
-    this.id = id;
-  }
+    @NotNull(message = "Dosage is required")
+    private String dosage;
 
-  public String getPatientName() {
-    return patientName;
-  }
+    @Size(max = 200, message = "Doctor notes must be at most 200 characters")
+    private String doctorNotes;
 
-  public void setPatientName(String patientName) {
-    this.patientName = patientName;
-  }
+    // Default constructor required by Spring Data
+    public Prescription() {
+    }
 
-  public Long getAppointmentId() {
-    return appointmentId;
-  }
+    // Parameterized constructor
+    public Prescription(String patientName, Long appointmentId, String medication, String dosage, String doctorNotes) {
+        this.patientName = patientName;
+        this.appointmentId = appointmentId;
+        this.medication = medication;
+        this.dosage = dosage;
+        this.doctorNotes = doctorNotes;
+    }
 
-  public void setAppointmentId(Long appointmentId) {
-    this.appointmentId = appointmentId;
-  }
+    // Getters and Setters
 
-  public String getMedication() {
-    return medication;
-  }
+    public String getId() {
+        return id;
+    }
 
-  public void setMedication(String medication) {
-    this.medication = medication;
-  }
+    public void setId(String id) {
+        this.id = id;
+    }
 
-  public String getDosage() {
-    return dosage;
-  }
+    public String getPatientName() {
+        return patientName;
+    }
 
-  public void setDosage(String dosage) {
-    this.dosage = dosage;
-  }
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
 
-  public String getDoctorNotes() {
-    return doctorNotes;
-  }
+    public Long getAppointmentId() {
+        return appointmentId;
+    }
 
-  public void setDoctorNotes(String doctorNotes) {
-    this.doctorNotes = doctorNotes;
-  }
+    public void setAppointmentId(Long appointmentId) {
+        this.appointmentId = appointmentId;
+    }
 
+    public String getMedication() {
+        return medication;
+    }
+
+    public void setMedication(String medication) {
+        this.medication = medication;
+    }
+
+    public String getDosage() {
+        return dosage;
+    }
+
+    public void setDosage(String dosage) {
+        this.dosage = dosage;
+    }
+
+    public String getDoctorNotes() {
+        return doctorNotes;
+    }
+
+    public void setDoctorNotes(String doctorNotes) {
+        this.doctorNotes = doctorNotes;
+    }
 }

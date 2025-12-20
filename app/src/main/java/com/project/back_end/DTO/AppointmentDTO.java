@@ -1,53 +1,111 @@
 package com.project.back_end.DTO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class AppointmentDTO {
+
+    // 1. Unique identifier for the appointment
     private Long id;
-    private Long patientId;
-    private String patientName;
+
+    // 2–3. Doctor information
     private Long doctorId;
     private String doctorName;
-    private String description;
-    private String status;
-    private String notes;
-    private LocalDateTime appointmentTime;
-    private int durationMinutes;
 
-    public AppointmentDTO(Long id, Long patientId, String patientName, Long doctorId,
-                          String doctorName, String description, String status,
-                          String notes, LocalDateTime appointmentTime, int durationMinutes) {
+    // 4–8. Patient information
+    private Long patientId;
+    private String patientName;
+    private String patientEmail;
+    private String patientPhone;
+    private String patientAddress;
+
+    // 9. Scheduled appointment time
+    private LocalDateTime appointmentTime;
+
+    // 10. Appointment status (e.g., Scheduled = 0, Completed = 1)
+    private int status;
+
+    // 11–13. Derived fields (date, time only, and end time)
+    private LocalDate appointmentDate;
+    private LocalTime appointmentTimeOnly;
+    private LocalDateTime endTime;
+
+    // 14. Constructor
+    public AppointmentDTO(Long id, Long doctorId, String doctorName,
+                          Long patientId, String patientName, String patientEmail,
+                          String patientPhone, String patientAddress,
+                          LocalDateTime appointmentTime, int status) {
         this.id = id;
-        this.patientId = patientId;
-        this.patientName = patientName;
         this.doctorId = doctorId;
         this.doctorName = doctorName;
-        this.description = description;
-        this.status = status;
-        this.notes = notes;
+        this.patientId = patientId;
+        this.patientName = patientName;
+        this.patientEmail = patientEmail;
+        this.patientPhone = patientPhone;
+        this.patientAddress = patientAddress;
         this.appointmentTime = appointmentTime;
-        this.durationMinutes = durationMinutes;
+        this.status = status;
+
+        // Calculate derived fields
+        if (appointmentTime != null) {
+            this.appointmentDate = appointmentTime.toLocalDate();
+            this.appointmentTimeOnly = appointmentTime.toLocalTime();
+            this.endTime = appointmentTime.plusHours(1);
+        }
     }
 
-    // Getters y setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public Long getPatientId() { return patientId; }
-    public void setPatientId(Long patientId) { this.patientId = patientId; }
-    public String getPatientName() { return patientName; }
-    public void setPatientName(String patientName) { this.patientName = patientName; }
-    public Long getDoctorId() { return doctorId; }
-    public void setDoctorId(Long doctorId) { this.doctorId = doctorId; }
-    public String getDoctorName() { return doctorName; }
-    public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
-    public LocalDateTime getAppointmentTime() { return appointmentTime; }
-    public void setAppointmentTime(LocalDateTime appointmentTime) { this.appointmentTime = appointmentTime; }
-    public int getDurationMinutes() { return durationMinutes; }
-    public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+    // 15. Getters
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getDoctorId() {
+        return doctorId;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public Long getPatientId() {
+        return patientId;
+    }
+
+    public String getPatientName() {
+        return patientName;
+    }
+
+    public String getPatientEmail() {
+        return patientEmail;
+    }
+
+    public String getPatientPhone() {
+        return patientPhone;
+    }
+
+    public String getPatientAddress() {
+        return patientAddress;
+    }
+
+    public LocalDateTime getAppointmentTime() {
+        return appointmentTime;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    public LocalTime getAppointmentTimeOnly() {
+        return appointmentTimeOnly;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
 }

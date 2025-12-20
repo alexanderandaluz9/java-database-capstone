@@ -2,14 +2,18 @@ package com.project.back_end.DTO;
 
 public class Login {
 
+    // 1. Email field for login
     private String email;
+
+    // 2. Password field for login
     private String password;
 
-    // Constructor vacío (Java lo crea igual, pero es buena práctica)
+    // 3. Default constructor (implicit, but included here for clarity)
     public Login() {
     }
 
-    // Getters y Setters
+    // 4. Getters and Setters
+
     public String getEmail() {
         return email;
     }
@@ -26,4 +30,3 @@ public class Login {
         this.password = password;
     }
 }
-

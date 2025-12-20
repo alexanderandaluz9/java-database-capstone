@@ -1,28 +1,28 @@
 package com.project.back_end.controllers;
 
-import java.util.Map;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.project.back_end.models.Admin;
-import com.project.back_end.services.AuthService;
+import com.project.back_end.services.Service;
+//import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("${api.path}admin")
+@RestController // 1. Mark as REST controller
+@RequestMapping("${api.path}admin") // Base URL: /api/admin if api.path=/api/
 public class AdminController {
 
-    private final AuthService service;
+    private final Service service;
 
-    public AdminController(AuthService service) {
+    // 2. Constructor-based injection
+    //@Autowired
+    public AdminController(Service service) {
         this.service = service;
     }
 
+    // 3. Admin login endpoint
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> adminLogin(@RequestBody Admin admin) {
-        return service.validateAdmin(admin);
+    public ResponseEntity<?> adminLogin(@RequestBody Admin admin) {
+        return service.validateAdmin(admin.getUsername(), admin.getPassword());
     }
 }
+
+
